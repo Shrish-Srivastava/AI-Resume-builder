@@ -5,10 +5,20 @@ interface ResumeLivePreviewProps {
 }
 
 /**
- * Live preview panel in builder — structured resume layout placeholder.
- * Same structure as /preview but inline in builder (skeleton shell).
+ * Live preview panel in builder — renders actual content from form.
+ * Clean typography, section headers. Empty sections are hidden.
  */
 export function ResumeLivePreview({ data }: ResumeLivePreviewProps) {
+  const sectionHeader = {
+    fontFamily: 'var(--font-serif)',
+    fontWeight: 600,
+    fontSize: 'var(--text-caption)',
+    textTransform: 'uppercase' as const,
+    letterSpacing: '0.05em',
+    color: 'var(--color-text-muted)',
+    marginBottom: 'var(--space-1)',
+  };
+
   return (
     <div
       className="resume-preview-shell"
@@ -16,27 +26,30 @@ export function ResumeLivePreview({ data }: ResumeLivePreviewProps) {
         fontFamily: 'var(--font-sans)',
         fontSize: 'var(--text-small)',
         color: 'var(--color-text)',
+        lineHeight: 1.5,
         maxWidth: 320,
         margin: '0 auto',
       }}
     >
-      <div style={{ borderBottom: '1px solid var(--color-border)', paddingBottom: 'var(--space-1)', marginBottom: 'var(--space-2)' }}>
-        <div style={{ fontFamily: 'var(--font-serif)', fontWeight: 600, fontSize: '1rem' }}>
-          {data.personal.name || 'Your name'}
-        </div>
-        <div style={{ fontSize: 'var(--text-caption)', color: 'var(--color-text-muted)' }}>
-          {[data.personal.email, data.personal.phone, data.personal.location].filter(Boolean).join(' · ') || 'Email · Phone · Location'}
-        </div>
-      </div>
+      <header style={{ borderBottom: '1px solid var(--color-border)', paddingBottom: 'var(--space-2)', marginBottom: 'var(--space-2)' }}>
+        <h2 style={{ fontFamily: 'var(--font-serif)', fontWeight: 600, fontSize: '1rem', margin: 0 }}>
+          {data.personal?.name || 'Your name'}
+        </h2>
+        <p style={{ margin: 'var(--space-1) 0 0', fontSize: 'var(--text-caption)', color: 'var(--color-text-muted)' }}>
+          {[data.personal?.email, data.personal?.phone, data.personal?.location].filter(Boolean).join(' · ') || 'Email · Phone · Location'}
+        </p>
+      </header>
+
       {data.summary && (
         <section style={{ marginBottom: 'var(--space-2)' }}>
-          <div style={{ fontFamily: 'var(--font-serif)', fontWeight: 600, fontSize: 'var(--text-caption)', marginBottom: 'var(--space-1)' }}>Summary</div>
-          <p style={{ margin: 0, lineHeight: 1.5 }}>{data.summary}</p>
+          <div style={sectionHeader}>Summary</div>
+          <p style={{ margin: 0 }}>{data.summary}</p>
         </section>
       )}
-      {data.education.length > 0 && (
+
+      {(data.education?.length ?? 0) > 0 && (
         <section style={{ marginBottom: 'var(--space-2)' }}>
-          <div style={{ fontFamily: 'var(--font-serif)', fontWeight: 600, fontSize: 'var(--text-caption)', marginBottom: 'var(--space-1)' }}>Education</div>
+          <div style={sectionHeader}>Education</div>
           {data.education.map((e) => (
             <div key={e.id} style={{ marginBottom: 'var(--space-1)' }}>
               <strong>{e.institution || 'Institution'}</strong> — {e.degree} {e.field && `in ${e.field}`} · {e.startDate}–{e.endDate}
@@ -44,9 +57,10 @@ export function ResumeLivePreview({ data }: ResumeLivePreviewProps) {
           ))}
         </section>
       )}
-      {data.experience.length > 0 && (
+
+      {(data.experience?.length ?? 0) > 0 && (
         <section style={{ marginBottom: 'var(--space-2)' }}>
-          <div style={{ fontFamily: 'var(--font-serif)', fontWeight: 600, fontSize: 'var(--text-caption)', marginBottom: 'var(--space-1)' }}>Experience</div>
+          <div style={sectionHeader}>Experience</div>
           {data.experience.map((e) => (
             <div key={e.id} style={{ marginBottom: 'var(--space-1)' }}>
               <strong>{e.role || 'Role'}</strong> at {e.company || 'Company'} · {e.startDate}–{e.endDate}
@@ -55,9 +69,10 @@ export function ResumeLivePreview({ data }: ResumeLivePreviewProps) {
           ))}
         </section>
       )}
-      {data.projects.length > 0 && (
+
+      {(data.projects?.length ?? 0) > 0 && (
         <section style={{ marginBottom: 'var(--space-2)' }}>
-          <div style={{ fontFamily: 'var(--font-serif)', fontWeight: 600, fontSize: 'var(--text-caption)', marginBottom: 'var(--space-1)' }}>Projects</div>
+          <div style={sectionHeader}>Projects</div>
           {data.projects.map((p) => (
             <div key={p.id} style={{ marginBottom: 'var(--space-1)' }}>
               <strong>{p.name || 'Project'}</strong>
@@ -66,10 +81,20 @@ export function ResumeLivePreview({ data }: ResumeLivePreviewProps) {
           ))}
         </section>
       )}
-      {data.skills.length > 0 && (
+
+      {(data.skills?.length ?? 0) > 0 && (
+        <section style={{ marginBottom: 'var(--space-2)' }}>
+          <div style={sectionHeader}>Skills</div>
+          <p style={{ margin: 0 }}>{(data.skills ?? []).join(', ')}</p>
+        </section>
+      )}
+
+      {(data.links?.github || data.links?.linkedin) && (
         <section>
-          <div style={{ fontFamily: 'var(--font-serif)', fontWeight: 600, fontSize: 'var(--text-caption)', marginBottom: 'var(--space-1)' }}>Skills</div>
-          <p style={{ margin: 0 }}>{data.skills.join(', ')}</p>
+          <div style={sectionHeader}>Links</div>
+          <p style={{ margin: 0, fontSize: 'var(--text-caption)' }}>
+            {[data.links?.github, data.links?.linkedin].filter(Boolean).join(' · ')}
+          </p>
         </section>
       )}
     </div>

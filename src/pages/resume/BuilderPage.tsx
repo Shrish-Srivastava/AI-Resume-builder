@@ -3,6 +3,7 @@ import type { ResumeData, EducationEntry, ExperienceEntry, ProjectEntry } from '
 import { sampleResume } from '@/lib/sampleResume';
 import { useResumeData } from '@/context/ResumeDataContext';
 import { ResumeLivePreview } from '@/components/resume/ResumeLivePreview';
+import { AtsScoreMeter } from '@/components/resume/AtsScoreMeter';
 
 function newId(): string {
   return `id-${Date.now()}-${Math.random().toString(36).slice(2, 9)}`;
@@ -257,6 +258,7 @@ export function BuilderPage() {
             minHeight: 520,
           }}
         >
+          <AtsScoreMeter data={data} />
           <ResumeLivePreview data={data} />
         </aside>
       </div>
