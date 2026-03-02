@@ -411,3 +411,22 @@
   font-size: var(--text-small);
   margin-bottom: var(--space-2);
 }
+
+/* ─── RESUME BUILDER LAYOUT ─── */
+
+.resume-builder-layout {
+  display: flex;
+  gap: var(--space-4);
+  align-items: flex-start;
+}
+
+@media (max-width: 768px) {
+  .resume-builder-layout {
+    flex-direction: column;
+  }
+  .resume-builder-preview {
+    position: static !important;
+    flex: 1 1 100% !important;
+    min-width: 100%;
+  }
+}

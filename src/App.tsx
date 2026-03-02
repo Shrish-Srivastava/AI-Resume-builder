@@ -1,4 +1,10 @@
 import { Routes, Route } from 'react-router-dom';
+import { ResumeHomePage } from './pages/resume/ResumeHomePage';
+import { BuilderPage } from './pages/resume/BuilderPage';
+import { PreviewPage } from './pages/resume/PreviewPage';
+import { ProofPage } from './pages/resume/ProofPage';
+import { ResumeAppLayout } from './layouts/ResumeAppLayout';
+import { ResumeDataProvider } from './context/ResumeDataContext';
 import { LandingPage } from './pages/LandingPage';
 import { DashboardLayout } from './layouts/DashboardLayout';
 import { DashboardPage } from './pages/DashboardPage';
@@ -17,7 +23,13 @@ import { RBProofPage } from './pages/rb/RBProofPage';
 function App() {
   return (
     <Routes>
-      <Route path="/" element={<LandingPage />} />
+      <Route path="/" element={<ResumeHomePage />} />
+      <Route element={<ResumeDataProvider><ResumeAppLayout /></ResumeDataProvider>}>
+        <Route path="builder" element={<BuilderPage />} />
+        <Route path="preview" element={<PreviewPage />} />
+        <Route path="proof" element={<ProofPage />} />
+      </Route>
+      <Route path="/placement" element={<LandingPage />} />
       <Route path="/prp/07-test" element={<TestChecklistPage />} />
       <Route path="/prp/08-ship" element={<ShipPage />} />
       <Route path="/rb/proof" element={<RBProofPage />} />
