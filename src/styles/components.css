@@ -431,6 +431,18 @@
   }
 }
 
+@media (max-width: 480px) {
+  .resume-builder-page {
+    padding: var(--space-2) !important;
+  }
+  .resume-builder-preview {
+    padding: var(--space-2) !important;
+  }
+  .ats-score-meter {
+    padding-bottom: var(--space-2) !important;
+  }
+}
+
 /* ─── PRINT STYLING ─── */
 
 @media print {

@@ -105,7 +105,7 @@ export function TemplatePicker({ value, onChange, accentColor }: TemplatePickerP
       <div style={{ fontSize: 'var(--text-caption)', color: 'var(--color-text-muted)', marginBottom: 6 }}>
         Template
       </div>
-      <div style={{ display: 'flex', gap: 'var(--space-2)' }}>
+      <div style={{ display: 'flex', gap: 'var(--space-2)', flexWrap: 'wrap' }}>
         {(['classic', 'modern', 'minimal'] as ResumeTemplate[]).map((t) => (
           <button
             key={t}

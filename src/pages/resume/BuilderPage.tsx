@@ -1,5 +1,6 @@
 import { useCallback, useState } from 'react';
 import type { ResumeData, EducationEntry, ExperienceEntry, ProjectEntry, SkillsByCategory } from '@/types/resume';
+import { emptyResume } from '@/types/resume';
 import { sampleResume } from '@/lib/sampleResume';
 import { useResumeData } from '@/context/ResumeDataContext';
 import { useTemplate } from '@/hooks/useTemplate';
@@ -117,12 +118,21 @@ export function BuilderPage() {
   }, [setData]);
 
   return (
-    <div className="resume-builder-page" style={{ padding: 'var(--space-4)', maxWidth: 1400, margin: '0 auto' }}>
+    <div className="resume-builder-page" style={{ padding: 'var(--space-4)', maxWidth: 1400, margin: '0 auto', overflowX: 'hidden' }}>
       <div className="resume-builder-layout">
         <div className="resume-builder-form" style={{ flex: '1 1 55%', minWidth: 0 }}>
           <div style={{ marginBottom: 'var(--space-3)' }}>
             <button type="button" className="kodnest-btn kodnest-btn--secondary kodnest-btn--sm" onClick={loadSample}>
               Load Sample Data
+            </button>
+            <button
+              type="button"
+              className="kodnest-btn kodnest-btn--secondary kodnest-btn--sm"
+              onClick={() => setData(JSON.parse(JSON.stringify(emptyResume)))}
+              style={{ marginLeft: 'var(--space-1)' }}
+              title="Clear all form data"
+            >
+              Clear All
             </button>
           </div>
 
@@ -410,7 +420,7 @@ export function BuilderPage() {
         >
           <TemplatePicker value={template} onChange={setTemplate} accentColor={accentColor} />
           <ColorThemePicker value={themeId} onChange={setTheme} />
-          <AtsScoreMeter data={data} />
+          <AtsScoreMeter data={data} compact />
           <ResumeLivePreview data={data} template={template} accentColor={accentColor} />
         </aside>
       </div>

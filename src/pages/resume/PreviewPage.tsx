@@ -8,6 +8,7 @@ import { TemplatePicker } from '@/components/resume/TemplatePicker';
 import { ColorThemePicker } from '@/components/resume/ColorThemePicker';
 import { resumeToPlainText } from '@/lib/resumeToText';
 import { getExportWarnings } from '@/lib/resumeValidation';
+import { AtsScoreMeter } from '@/components/resume/AtsScoreMeter';
 
 export function PreviewPage() {
   const { data } = useResumeData();
@@ -44,9 +45,10 @@ export function PreviewPage() {
   }, [data]);
 
   return (
-    <div className="resume-print-area" style={{ background: '#fff', minHeight: 'calc(100vh - var(--topbar-height))', padding: 'var(--space-4)' }}>
+    <div className="resume-print-area" style={{ background: '#fff', minHeight: 'calc(100vh - var(--topbar-height))', padding: 'var(--space-4)', overflowX: 'hidden' }}>
       <div style={{ maxWidth: 800, margin: '0 auto' }}>
         <div className="no-print" style={{ marginBottom: 'var(--space-3)' }}>
+          <AtsScoreMeter data={data} />
           <TemplatePicker value={template} onChange={setTemplate} accentColor={accentColor} />
           <ColorThemePicker value={themeId} onChange={setTheme} />
           {exportWarning && (

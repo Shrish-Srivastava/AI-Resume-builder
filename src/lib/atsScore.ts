@@ -1,9 +1,11 @@
 /**
- * ATS Score v1 — Deterministic scoring (0–100)
- * Cap at 100.
+ * ATS Score v2 — Deterministic scoring (0–100)
+ * No AI. Rules-based.
  */
 
 import type { ResumeData } from '@/types/resume';
+
+const ACTION_VERBS = /\b(built|led|designed|improved|developed|created|managed|implemented|achieved|delivered|optimized|reduced|increased|established|launched|coordinated|automated|resolved|transformed|enhanced)\b/i;
 
 function getAllSkills(data: ResumeData): string[] {
   const s = data.skills;
@@ -11,95 +13,93 @@ function getAllSkills(data: ResumeData): string[] {
   return [...(s.technical ?? []), ...(s.soft ?? []), ...(s.tools ?? [])];
 }
 
-function wordCount(s: string): number {
-  return s.trim().split(/\s+/).filter(Boolean).length;
-}
-
-/** Check if text contains a number (%, X, k, digits, etc.) */
-function hasMeasurableNumber(text: string): boolean {
+/** Check if summary contains action verbs */
+function hasActionVerbs(text: string): boolean {
   if (!text || !text.trim()) return false;
-  return /[0-9%]|\b(k|K|M|m|x|X)\b|percent|%\s*\d|\d+\s*%/.test(text);
+  return ACTION_VERBS.test(text);
 }
 
-function hasNumbersInBullets(data: ResumeData): boolean {
-  const checkDesc = (desc?: string) => desc && hasMeasurableNumber(desc);
-  const expHas = data.experience.some((e) => checkDesc(e.description));
-  const projHas = data.projects.some(
-    (p) => checkDesc(p.description) || (p.techStack && p.techStack.some((t) => hasMeasurableNumber(t)))
-  );
-  return expHas || projHas;
-}
-
-function educationHasCompleteFields(data: ResumeData): boolean {
-  if (data.education.length === 0) return false;
-  return data.education.some(
-    (e) =>
-      !!e.institution?.trim() &&
-      !!e.degree?.trim() &&
-      !!e.startDate?.trim() &&
-      !!e.endDate?.trim()
-  );
+/** Check if experience has at least 1 entry with bullets (description) */
+function hasExperienceWithBullets(data: ResumeData): boolean {
+  return (data.experience ?? []).some((e) => !!(e.description ?? '').trim());
 }
 
 export function computeAtsScore(data: ResumeData): number {
   let score = 0;
-
-  const summaryWords = wordCount(data.summary ?? '');
-  if (summaryWords >= 40 && summaryWords <= 120) score += 15;
-
+  const personal = data.personal ?? { name: '', email: '', phone: '', location: '' };
+  const summary = (data.summary ?? '').trim();
+  const education = data.education ?? [];
   const projects = data.projects ?? [];
-  const experience = data.experience ?? [];
   const skills = getAllSkills(data);
   const links = data.links ?? {};
 
-  if (projects.length >= 2) score += 10;
-  if (experience.length >= 1) score += 10;
-  if (skills.length >= 8) score += 10;
-  if (links.github?.trim() || links.linkedin?.trim()) score += 10;
-  if (hasNumbersInBullets(data)) score += 15;
-  if (educationHasCompleteFields(data)) score += 10;
+  if (personal.name?.trim()) score += 10;
+  if (personal.email?.trim()) score += 10;
+  if (summary.length > 50) score += 10;
+  if (hasExperienceWithBullets(data)) score += 15;
+  if (education.length >= 1) score += 10;
+  if (skills.length >= 5) score += 10;
+  if (projects.length >= 1) score += 10;
+  if (personal.phone?.trim()) score += 5;
+  if (links.linkedin?.trim()) score += 5;
+  if (links.github?.trim()) score += 5;
+  if (hasActionVerbs(summary)) score += 10;
 
   return Math.min(100, score);
 }
 
-export function getAtsSuggestions(data: ResumeData): string[] {
-  const suggestions: string[] = [];
+export interface AtsSuggestion {
+  text: string;
+  points: number;
+}
 
-  const summaryWords = wordCount(data.summary ?? '');
-  if (summaryWords < 40 || summaryWords > 120)
-    suggestions.push('Write a stronger summary (40–120 words).');
-
+/** List missing items that would increase score. Returns suggestions with point values. */
+export function getAtsSuggestions(data: ResumeData): AtsSuggestion[] {
+  const suggestions: AtsSuggestion[] = [];
+  const personal = data.personal ?? { name: '', email: '', phone: '', location: '' };
+  const summary = (data.summary ?? '').trim();
+  const education = data.education ?? [];
   const projects = data.projects ?? [];
-  const experience = data.experience ?? [];
   const skills = getAllSkills(data);
   const links = data.links ?? {};
 
-  if (projects.length < 2) suggestions.push('Add at least 2 projects.');
-  if (experience.length < 1) suggestions.push('Add at least 1 experience entry.');
-  if (skills.length < 8) suggestions.push('Add more skills (target 8+).');
-  if (!links.github?.trim() && !links.linkedin?.trim())
-    suggestions.push('Add GitHub or LinkedIn link.');
-  if (!hasNumbersInBullets(data))
-    suggestions.push('Add measurable impact (numbers) in bullets.');
-  if (!educationHasCompleteFields(data))
-    suggestions.push('Complete education fields (institution, degree, dates).');
+  if (!personal.name?.trim()) suggestions.push({ text: 'Add your name', points: 10 });
+  if (!personal.email?.trim()) suggestions.push({ text: 'Add your email', points: 10 });
+  if (summary.length <= 50) suggestions.push({ text: 'Add a professional summary (50+ characters)', points: 10 });
+  if (!hasExperienceWithBullets(data)) suggestions.push({ text: 'Add at least 1 experience entry with bullets', points: 15 });
+  if (education.length < 1) suggestions.push({ text: 'Add at least 1 education entry', points: 10 });
+  if (skills.length < 5) suggestions.push({ text: 'Add at least 5 skills', points: 10 });
+  if (projects.length < 1) suggestions.push({ text: 'Add at least 1 project', points: 10 });
+  if (!personal.phone?.trim()) suggestions.push({ text: 'Add your phone number', points: 5 });
+  if (!links.linkedin?.trim()) suggestions.push({ text: 'Add LinkedIn URL', points: 5 });
+  if (!links.github?.trim()) suggestions.push({ text: 'Add GitHub URL', points: 5 });
+  if (!hasActionVerbs(summary) && summary.length > 0) suggestions.push({ text: 'Add action verbs to summary (e.g. built, led, designed)', points: 10 });
 
-  return suggestions.slice(0, 3);
+  return suggestions;
 }
 
-/** Top 3 Improvements — guidance wording for improvement panel */
-export function getTopImprovements(data: ResumeData): string[] {
-  const improvements: string[] = [];
-  const summaryWords = wordCount(data.summary ?? '');
-  const projects = data.projects ?? [];
-  const experience = data.experience ?? [];
-  const skills = getAllSkills(data);
-
-  if (projects.length < 2) improvements.push('Add at least 2 projects.');
-  if (!hasNumbersInBullets(data)) improvements.push('Add measurable impact (numbers) in bullets.');
-  if (summaryWords < 40) improvements.push('Expand summary to 40+ words.');
-  if (skills.length < 8) improvements.push('Add more skills (target 8+).');
-  if (experience.length < 1) improvements.push('Add internship or project work as experience.');
-
-  return improvements.slice(0, 3);
+/** Top 3 improvements — used for builder compact display */
+export function getTopImprovements(data: ResumeData): AtsSuggestion[] {
+  return getAtsSuggestions(data).slice(0, 3);
 }
+
+/** Score zone for color/label */
+export type AtsZone = 'needs-work' | 'getting-there' | 'strong';
+
+export function getAtsZone(score: number): AtsZone {
+  if (score <= 40) return 'needs-work';
+  if (score <= 70) return 'getting-there';
+  return 'strong';
+}
+
+export const ATS_ZONE_LABELS: Record<AtsZone, string> = {
+  'needs-work': 'Needs Work',
+  'getting-there': 'Getting There',
+  'strong': 'Strong Resume',
+};
+
+export const ATS_ZONE_COLORS: Record<AtsZone, string> = {
+  'needs-work': '#dc2626', // red
+  'getting-there': '#d97706', // amber
+  'strong': '#16a34a', // green
+};
