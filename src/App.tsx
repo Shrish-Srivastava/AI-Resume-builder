@@ -9,11 +9,15 @@ import { ProfilePage } from './pages/ProfilePage';
 import { AnalyzerPage } from './pages/AnalyzerPage';
 import { HistoryPage } from './pages/HistoryPage';
 import { ResultsPage } from './pages/ResultsPage';
+import { TestChecklistPage } from './pages/TestChecklistPage';
+import { ShipPage } from './pages/ShipPage';
 
 function App() {
   return (
     <Routes>
       <Route path="/" element={<LandingPage />} />
+      <Route path="/prp/07-test" element={<TestChecklistPage />} />
+      <Route path="/prp/08-ship" element={<ShipPage />} />
       <Route path="/dashboard" element={<DashboardLayout />}>
         <Route index element={<DashboardPage />} />
         <Route path="practice" element={<PracticePage />} />
