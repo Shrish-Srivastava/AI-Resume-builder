@@ -3,9 +3,11 @@ import type { ResumeData, EducationEntry, ExperienceEntry, ProjectEntry, SkillsB
 import { sampleResume } from '@/lib/sampleResume';
 import { useResumeData } from '@/context/ResumeDataContext';
 import { useTemplate } from '@/hooks/useTemplate';
+import { useTheme } from '@/hooks/useTheme';
 import { ResumeLivePreview } from '@/components/resume/ResumeLivePreview';
 import { AtsScoreMeter } from '@/components/resume/AtsScoreMeter';
-import { TemplateTabs } from '@/components/resume/TemplateTabs';
+import { TemplatePicker } from '@/components/resume/TemplatePicker';
+import { ColorThemePicker } from '@/components/resume/ColorThemePicker';
 import { BulletGuidance } from '@/components/resume/BulletGuidance';
 import { TagInput } from '@/components/resume/TagInput';
 
@@ -16,6 +18,7 @@ function newId(): string {
 export function BuilderPage() {
   const { data, setData } = useResumeData();
   const [template, setTemplate] = useTemplate();
+  const [themeId, setTheme, accentColor] = useTheme();
 
   const update = useCallback(<K extends keyof ResumeData>(key: K, value: ResumeData[K]) => {
     setData((prev) => ({ ...prev, [key]: value }));
@@ -118,7 +121,6 @@ export function BuilderPage() {
       <div className="resume-builder-layout">
         <div className="resume-builder-form" style={{ flex: '1 1 55%', minWidth: 0 }}>
           <div style={{ marginBottom: 'var(--space-3)' }}>
-            <TemplateTabs value={template} onChange={setTemplate} />
             <button type="button" className="kodnest-btn kodnest-btn--secondary kodnest-btn--sm" onClick={loadSample}>
               Load Sample Data
             </button>
@@ -406,9 +408,10 @@ export function BuilderPage() {
             minHeight: 520,
           }}
         >
-          <TemplateTabs value={template} onChange={setTemplate} />
+          <TemplatePicker value={template} onChange={setTemplate} accentColor={accentColor} />
+          <ColorThemePicker value={themeId} onChange={setTheme} />
           <AtsScoreMeter data={data} />
-          <ResumeLivePreview data={data} template={template} />
+          <ResumeLivePreview data={data} template={template} accentColor={accentColor} />
         </aside>
       </div>
     </div>
