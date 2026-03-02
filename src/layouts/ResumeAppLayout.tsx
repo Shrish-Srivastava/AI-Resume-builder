@@ -12,7 +12,7 @@ export function ResumeAppLayout() {
   return (
     <div className="resume-app" style={{ minHeight: '100vh', display: 'flex', flexDirection: 'column', background: 'var(--color-bg, #F7F6F3)' }}>
       <header
-        className="resume-app__nav"
+        className="resume-app__nav no-print"
         style={{
           height: 'var(--topbar-height, 64px)',
           padding: '0 var(--space-4, 40px)',

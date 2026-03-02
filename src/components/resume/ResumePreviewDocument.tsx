@@ -24,6 +24,9 @@ export function ResumePreviewDocument({ data, template = 'classic' }: ResumePrev
         margin: '0 auto',
         padding: 'var(--space-5)',
         lineHeight: styles.bodyLineHeight,
+        wordWrap: 'break-word',
+        overflowWrap: 'break-word',
+        boxSizing: 'border-box',
       }}
     >
       <header style={{ borderBottom: '1px solid #111', paddingBottom: 'var(--space-2)', marginBottom: styles.sectionSpacing }}>
@@ -55,7 +58,7 @@ export function ResumePreviewDocument({ data, template = 'classic' }: ResumePrev
             Education
           </h2>
           {data.education.map((e) => (
-            <div key={e.id} style={{ marginBottom: 'var(--space-2)' }}>
+            <div key={e.id} className="resume-entry" style={{ marginBottom: 'var(--space-2)' }}>
               <div style={{ display: 'flex', justifyContent: 'space-between', flexWrap: 'wrap', gap: 'var(--space-1)' }}>
                 <strong style={{ fontFamily: 'var(--font-serif)' }}>{e.institution || 'Institution'}</strong>
                 <span style={{ fontSize: 'var(--text-small)', color: '#555' }}>{e.startDate} – {e.endDate}</span>
@@ -73,7 +76,7 @@ export function ResumePreviewDocument({ data, template = 'classic' }: ResumePrev
             Experience
           </h2>
           {data.experience.map((e) => (
-            <div key={e.id} style={{ marginBottom: 'var(--space-2)' }}>
+            <div key={e.id} className="resume-entry" style={{ marginBottom: 'var(--space-2)' }}>
               <div style={{ display: 'flex', justifyContent: 'space-between', flexWrap: 'wrap', gap: 'var(--space-1)' }}>
                 <strong style={{ fontFamily: 'var(--font-serif)' }}>{e.role || 'Role'}</strong>
                 <span style={{ fontSize: 'var(--text-small)', color: '#555' }}>{e.startDate} – {e.endDate}</span>
@@ -91,7 +94,7 @@ export function ResumePreviewDocument({ data, template = 'classic' }: ResumePrev
             Projects
           </h2>
           {data.projects.map((p) => (
-            <div key={p.id} style={{ marginBottom: 'var(--space-2)' }}>
+            <div key={p.id} className="resume-entry" style={{ marginBottom: 'var(--space-2)' }}>
               <strong style={{ fontFamily: 'var(--font-serif)' }}>{p.name || 'Project'}</strong>
               {p.url && <span style={{ fontSize: 'var(--text-small)', color: '#555' }}> · {p.url}</span>}
               {p.description && <p style={{ margin: 'var(--space-1) 0 0', fontSize: 'var(--text-small)' }}>{p.description}</p>}

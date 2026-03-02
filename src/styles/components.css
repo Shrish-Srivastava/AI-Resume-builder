@@ -430,3 +430,65 @@
     min-width: 100%;
   }
 }
+
+/* ─── PRINT STYLING ─── */
+
+@media print {
+  /* Hide nav and UI elements */
+  .resume-app__nav,
+  .no-print {
+    display: none !important;
+  }
+
+  /* Print-only resume container */
+  .resume-print-area {
+    padding: 0 !important;
+    background: #fff !important;
+  }
+
+  .resume-preview-document {
+    background: #fff !important;
+    color: #111 !important;
+    max-width: 100% !important;
+    box-shadow: none !important;
+  }
+
+  .resume-preview-document,
+  .resume-preview-document * {
+    color: #111 !important;
+  }
+
+  .resume-preview-document p,
+  .resume-preview-document span[style*="color"],
+  .resume-preview-document span {
+    color: #333 !important;
+  }
+
+  /* No colored accents in print */
+  .resume-preview-document strong {
+    color: #111 !important;
+  }
+
+  /* White background, no accents */
+  body {
+    background: #fff !important;
+  }
+
+  .resume-app {
+    background: #fff !important;
+  }
+
+  /* Clean margins */
+  @page {
+    margin: 1.5cm;
+  }
+
+  /* Avoid splitting project/experience entries across pages */
+  .resume-preview-document .resume-entry {
+    page-break-inside: avoid;
+  }
+
+  .resume-preview-document section {
+    page-break-inside: avoid;
+  }
+}
