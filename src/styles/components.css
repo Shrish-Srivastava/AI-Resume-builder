@@ -164,6 +164,22 @@
   word-break: break-word;
 }
 
+.kodnest-panel__textarea {
+  width: 100%;
+  min-height: 120px;
+  font-family: var(--font-sans);
+  font-size: var(--text-small);
+  color: var(--color-text);
+  background: transparent;
+  border: none;
+  resize: vertical;
+  outline: none;
+}
+
+.kodnest-panel__textarea::placeholder {
+  color: var(--color-text-subtle);
+}
+
 .kodnest-panel__actions,
 .kodnest-panel__feedback {
   display: flex;

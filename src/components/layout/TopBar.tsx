@@ -5,9 +5,11 @@ interface TopBarProps {
   step: number;
   totalSteps: number;
   status: StatusType;
+  centerText?: string;
 }
 
-export function TopBar({ projectName, step, totalSteps, status }: TopBarProps) {
+export function TopBar({ projectName, step, totalSteps, status, centerText }: TopBarProps) {
+  const displayCenter = centerText ?? `Step ${step} / ${totalSteps}`;
   return (
     <header className="kodnest-topbar" role="banner">
       <div className="kodnest-topbar__left">
@@ -15,7 +17,7 @@ export function TopBar({ projectName, step, totalSteps, status }: TopBarProps) {
       </div>
       <div className="kodnest-topbar__center">
         <span className="kodnest-topbar__progress">
-          Step {step} / {totalSteps}
+          {displayCenter}
         </span>
       </div>
       <div className="kodnest-topbar__right">

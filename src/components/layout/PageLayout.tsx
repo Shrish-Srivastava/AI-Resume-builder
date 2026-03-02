@@ -23,6 +23,13 @@ interface PageLayoutProps {
     onError?: () => void;
     onAddScreenshot?: () => void;
   };
+  centerText?: string;
+  panelPromptProps?: {
+    promptLabel?: string;
+    promptAsTextarea?: boolean;
+    promptValue?: string;
+    onPromptChange?: (value: string) => void;
+  };
   proofHandlers?: {
     onToggle?: (id: string, checked: boolean) => void;
     onProofInput?: (id: string, value: string) => void;
@@ -41,11 +48,13 @@ export function PageLayout({
   promptText,
   proofItems,
   panelActions,
+  panelPromptProps,
   proofHandlers,
+  centerText,
 }: PageLayoutProps) {
   return (
     <div className="kodnest-page">
-      <TopBar projectName={projectName} step={step} totalSteps={totalSteps} status={status} />
+      <TopBar projectName={projectName} step={step} totalSteps={totalSteps} status={status} centerText={centerText} />
       <div className="kodnest-page__body">
         <div className="kodnest-page__content">
           <ContextHeader headline={headline} subtext={subtext} />
@@ -54,6 +63,7 @@ export function PageLayout({
             <SecondaryPanel
               stepExplanation={stepExplanation}
               promptText={promptText}
+              {...panelPromptProps}
               {...panelActions}
             />
           </div>

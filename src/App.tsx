@@ -11,6 +11,8 @@ import { HistoryPage } from './pages/HistoryPage';
 import { ResultsPage } from './pages/ResultsPage';
 import { TestChecklistPage } from './pages/TestChecklistPage';
 import { ShipPage } from './pages/ShipPage';
+import { RBStepPage } from './pages/rb/RBStepPage';
+import { RBProofPage } from './pages/rb/RBProofPage';
 
 function App() {
   return (
@@ -18,6 +20,15 @@ function App() {
       <Route path="/" element={<LandingPage />} />
       <Route path="/prp/07-test" element={<TestChecklistPage />} />
       <Route path="/prp/08-ship" element={<ShipPage />} />
+      <Route path="/rb/proof" element={<RBProofPage />} />
+      <Route path="/rb/01-problem" element={<RBStepPage />} />
+      <Route path="/rb/02-market" element={<RBStepPage />} />
+      <Route path="/rb/03-architecture" element={<RBStepPage />} />
+      <Route path="/rb/04-hld" element={<RBStepPage />} />
+      <Route path="/rb/05-lld" element={<RBStepPage />} />
+      <Route path="/rb/06-build" element={<RBStepPage />} />
+      <Route path="/rb/07-test" element={<RBStepPage />} />
+      <Route path="/rb/08-ship" element={<RBStepPage />} />
       <Route path="/dashboard" element={<DashboardLayout />}>
         <Route index element={<DashboardPage />} />
         <Route path="practice" element={<PracticePage />} />
