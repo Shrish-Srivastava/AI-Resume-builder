@@ -2,8 +2,11 @@ import { useCallback } from 'react';
 import type { ResumeData, EducationEntry, ExperienceEntry, ProjectEntry } from '@/types/resume';
 import { sampleResume } from '@/lib/sampleResume';
 import { useResumeData } from '@/context/ResumeDataContext';
+import { useTemplate } from '@/hooks/useTemplate';
 import { ResumeLivePreview } from '@/components/resume/ResumeLivePreview';
 import { AtsScoreMeter } from '@/components/resume/AtsScoreMeter';
+import { TemplateTabs } from '@/components/resume/TemplateTabs';
+import { BulletGuidance } from '@/components/resume/BulletGuidance';
 
 function newId(): string {
   return `id-${Date.now()}-${Math.random().toString(36).slice(2, 9)}`;
@@ -11,6 +14,7 @@ function newId(): string {
 
 export function BuilderPage() {
   const { data, setData } = useResumeData();
+  const [template, setTemplate] = useTemplate();
 
   const update = useCallback(<K extends keyof ResumeData>(key: K, value: ResumeData[K]) => {
     setData((prev) => ({ ...prev, [key]: value }));
@@ -85,6 +89,7 @@ export function BuilderPage() {
       <div className="resume-builder-layout">
         <div className="resume-builder-form" style={{ flex: '1 1 55%', minWidth: 0 }}>
           <div style={{ marginBottom: 'var(--space-3)' }}>
+            <TemplateTabs value={template} onChange={setTemplate} />
             <button type="button" className="kodnest-btn kodnest-btn--secondary kodnest-btn--sm" onClick={loadSample}>
               Load Sample Data
             </button>
@@ -185,7 +190,8 @@ export function BuilderPage() {
                   <input className="kodnest-input" placeholder="End" value={entry.endDate} onChange={(e) => updateExperience(entry.id, { endDate: e.target.value })} />
                 </div>
                 <textarea className="kodnest-input" placeholder="Description (optional)" value={entry.description ?? ''} onChange={(e) => updateExperience(entry.id, { description: e.target.value })} rows={3} style={{ resize: 'vertical', marginBottom: 'var(--space-1)' }} />
-                <button type="button" className="kodnest-btn kodnest-btn--secondary kodnest-btn--sm" onClick={() => removeExperience(entry.id)}>Remove</button>
+                <BulletGuidance text={entry.description ?? ''} />
+                <button type="button" className="kodnest-btn kodnest-btn--secondary kodnest-btn--sm" onClick={() => removeExperience(entry.id)} style={{ marginTop: 'var(--space-1)' }}>Remove</button>
               </div>
             ))}
           </section>
@@ -204,8 +210,9 @@ export function BuilderPage() {
                 <input className="kodnest-input" placeholder="Project name" value={entry.name} onChange={(e) => updateProject(entry.id, { name: e.target.value })} style={{ marginBottom: 'var(--space-1)' }} />
                 <input className="kodnest-input" placeholder="URL (optional)" value={entry.url ?? ''} onChange={(e) => updateProject(entry.id, { url: e.target.value })} style={{ marginBottom: 'var(--space-1)' }} />
                 <textarea className="kodnest-input" placeholder="Description (optional)" value={entry.description ?? ''} onChange={(e) => updateProject(entry.id, { description: e.target.value })} rows={2} style={{ resize: 'vertical', marginBottom: 'var(--space-1)' }} />
-                <input className="kodnest-input" placeholder="Tech (optional)" value={entry.tech ?? ''} onChange={(e) => updateProject(entry.id, { tech: e.target.value })} style={{ marginBottom: 'var(--space-1)' }} />
-                <button type="button" className="kodnest-btn kodnest-btn--secondary kodnest-btn--sm" onClick={() => removeProject(entry.id)}>Remove</button>
+                <BulletGuidance text={entry.description ?? ''} />
+                <input className="kodnest-input" placeholder="Tech (optional)" value={entry.tech ?? ''} onChange={(e) => updateProject(entry.id, { tech: e.target.value })} style={{ marginBottom: 'var(--space-1)', marginTop: 'var(--space-1)' }} />
+                <button type="button" className="kodnest-btn kodnest-btn--secondary kodnest-btn--sm" onClick={() => removeProject(entry.id)} style={{ marginTop: 'var(--space-1)' }}>Remove</button>
               </div>
             ))}
           </section>
@@ -258,8 +265,9 @@ export function BuilderPage() {
             minHeight: 520,
           }}
         >
+          <TemplateTabs value={template} onChange={setTemplate} />
           <AtsScoreMeter data={data} />
-          <ResumeLivePreview data={data} />
+          <ResumeLivePreview data={data} template={template} />
         </aside>
       </div>
     </div>

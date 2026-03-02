@@ -78,3 +78,20 @@ export function getAtsSuggestions(data: ResumeData): string[] {
 
   return suggestions.slice(0, 3);
 }
+
+/** Top 3 Improvements — guidance wording for improvement panel */
+export function getTopImprovements(data: ResumeData): string[] {
+  const improvements: string[] = [];
+  const summaryWords = wordCount(data.summary ?? '');
+  const projects = data.projects ?? [];
+  const experience = data.experience ?? [];
+  const skills = data.skills ?? [];
+
+  if (projects.length < 2) improvements.push('Add at least 2 projects.');
+  if (!hasNumbersInBullets(data)) improvements.push('Add measurable impact (numbers) in bullets.');
+  if (summaryWords < 40) improvements.push('Expand summary to 40+ words.');
+  if (skills.length < 8) improvements.push('Add more skills (target 8+).');
+  if (experience.length < 1) improvements.push('Add internship or project work as experience.');
+
+  return improvements.slice(0, 3);
+}

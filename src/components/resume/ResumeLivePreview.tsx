@@ -1,18 +1,23 @@
 import type { ResumeData } from '@/types/resume';
+import { TEMPLATE_STYLES, type ResumeTemplate } from '@/lib/resumeTemplate';
 
 interface ResumeLivePreviewProps {
   data: ResumeData;
+  template?: ResumeTemplate;
 }
 
 /**
  * Live preview panel in builder — renders actual content from form.
  * Clean typography, section headers. Empty sections are hidden.
+ * Template changes layout styling only (Classic, Modern, Minimal).
  */
-export function ResumeLivePreview({ data }: ResumeLivePreviewProps) {
+export function ResumeLivePreview({ data, template = 'classic' }: ResumeLivePreviewProps) {
+  const styles = TEMPLATE_STYLES[template];
+
   const sectionHeader = {
     fontFamily: 'var(--font-serif)',
     fontWeight: 600,
-    fontSize: 'var(--text-caption)',
+    fontSize: styles.sectionHeaderSize,
     textTransform: 'uppercase' as const,
     letterSpacing: '0.05em',
     color: 'var(--color-text-muted)',
@@ -21,18 +26,18 @@ export function ResumeLivePreview({ data }: ResumeLivePreviewProps) {
 
   return (
     <div
-      className="resume-preview-shell"
+      className={`resume-preview-shell resume-preview-shell--${template}`}
       style={{
         fontFamily: 'var(--font-sans)',
         fontSize: 'var(--text-small)',
         color: 'var(--color-text)',
-        lineHeight: 1.5,
+        lineHeight: styles.bodyLineHeight,
         maxWidth: 320,
         margin: '0 auto',
       }}
     >
-      <header style={{ borderBottom: '1px solid var(--color-border)', paddingBottom: 'var(--space-2)', marginBottom: 'var(--space-2)' }}>
-        <h2 style={{ fontFamily: 'var(--font-serif)', fontWeight: 600, fontSize: '1rem', margin: 0 }}>
+      <header style={{ borderBottom: '1px solid var(--color-border)', paddingBottom: 'var(--space-2)', marginBottom: styles.sectionSpacing }}>
+        <h2 style={{ fontFamily: 'var(--font-serif)', fontWeight: 600, fontSize: styles.headerFontSize, letterSpacing: styles.headerLetterSpacing, margin: 0 }}>
           {data.personal?.name || 'Your name'}
         </h2>
         <p style={{ margin: 'var(--space-1) 0 0', fontSize: 'var(--text-caption)', color: 'var(--color-text-muted)' }}>
@@ -41,14 +46,14 @@ export function ResumeLivePreview({ data }: ResumeLivePreviewProps) {
       </header>
 
       {data.summary && (
-        <section style={{ marginBottom: 'var(--space-2)' }}>
+        <section style={{ marginBottom: styles.sectionSpacing }}>
           <div style={sectionHeader}>Summary</div>
           <p style={{ margin: 0 }}>{data.summary}</p>
         </section>
       )}
 
       {(data.education?.length ?? 0) > 0 && (
-        <section style={{ marginBottom: 'var(--space-2)' }}>
+        <section style={{ marginBottom: styles.sectionSpacing }}>
           <div style={sectionHeader}>Education</div>
           {data.education.map((e) => (
             <div key={e.id} style={{ marginBottom: 'var(--space-1)' }}>
@@ -59,7 +64,7 @@ export function ResumeLivePreview({ data }: ResumeLivePreviewProps) {
       )}
 
       {(data.experience?.length ?? 0) > 0 && (
-        <section style={{ marginBottom: 'var(--space-2)' }}>
+        <section style={{ marginBottom: styles.sectionSpacing }}>
           <div style={sectionHeader}>Experience</div>
           {data.experience.map((e) => (
             <div key={e.id} style={{ marginBottom: 'var(--space-1)' }}>
@@ -71,7 +76,7 @@ export function ResumeLivePreview({ data }: ResumeLivePreviewProps) {
       )}
 
       {(data.projects?.length ?? 0) > 0 && (
-        <section style={{ marginBottom: 'var(--space-2)' }}>
+        <section style={{ marginBottom: styles.sectionSpacing }}>
           <div style={sectionHeader}>Projects</div>
           {data.projects.map((p) => (
             <div key={p.id} style={{ marginBottom: 'var(--space-1)' }}>
@@ -83,7 +88,7 @@ export function ResumeLivePreview({ data }: ResumeLivePreviewProps) {
       )}
 
       {(data.skills?.length ?? 0) > 0 && (
-        <section style={{ marginBottom: 'var(--space-2)' }}>
+        <section style={{ marginBottom: styles.sectionSpacing }}>
           <div style={sectionHeader}>Skills</div>
           <p style={{ margin: 0 }}>{(data.skills ?? []).join(', ')}</p>
         </section>

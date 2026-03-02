@@ -1,12 +1,21 @@
 import type { ResumeData } from '@/types/resume';
+import { TEMPLATE_STYLES, type ResumeTemplate } from '@/lib/resumeTemplate';
+
+interface ResumePreviewDocumentProps {
+  data: ResumeData;
+  template?: ResumeTemplate;
+}
 
 /**
  * Clean resume layout for /preview — premium typography, minimal black + white, no colors.
+ * Template changes layout styling only (Classic, Modern, Minimal).
  */
-export function ResumePreviewDocument({ data }: { data: ResumeData }) {
+export function ResumePreviewDocument({ data, template = 'classic' }: ResumePreviewDocumentProps) {
+  const styles = TEMPLATE_STYLES[template];
+
   return (
     <article
-      className="resume-preview-document"
+      className={`resume-preview-document resume-preview-document--${template}`}
       style={{
         fontFamily: 'var(--font-sans)',
         color: '#111',
@@ -14,11 +23,11 @@ export function ResumePreviewDocument({ data }: { data: ResumeData }) {
         maxWidth: 720,
         margin: '0 auto',
         padding: 'var(--space-5)',
-        lineHeight: 1.5,
+        lineHeight: styles.bodyLineHeight,
       }}
     >
-      <header style={{ borderBottom: '1px solid #111', paddingBottom: 'var(--space-2)', marginBottom: 'var(--space-3)' }}>
-        <h1 style={{ fontFamily: 'var(--font-serif)', fontSize: '1.75rem', fontWeight: 600, margin: 0, letterSpacing: '-0.02em' }}>
+      <header style={{ borderBottom: '1px solid #111', paddingBottom: 'var(--space-2)', marginBottom: styles.sectionSpacing }}>
+        <h1 style={{ fontFamily: 'var(--font-serif)', fontSize: styles.headerFontSize, fontWeight: 600, margin: 0, letterSpacing: styles.headerLetterSpacing }}>
           {data.personal.name || 'Your name'}
         </h1>
         <p style={{ margin: 'var(--space-1) 0 0', fontSize: 'var(--text-small)', color: '#333' }}>
@@ -32,8 +41,8 @@ export function ResumePreviewDocument({ data }: { data: ResumeData }) {
       </header>
 
       {data.summary && (
-        <section style={{ marginBottom: 'var(--space-3)' }}>
-          <h2 style={{ fontFamily: 'var(--font-serif)', fontSize: 'var(--text-body)', fontWeight: 600, marginBottom: 'var(--space-1)', textTransform: 'uppercase', letterSpacing: '0.05em' }}>
+        <section style={{ marginBottom: styles.sectionSpacing }}>
+          <h2 style={{ fontFamily: 'var(--font-serif)', fontSize: styles.sectionHeaderSize, fontWeight: 600, marginBottom: 'var(--space-1)', textTransform: 'uppercase', letterSpacing: '0.05em' }}>
             Summary
           </h2>
           <p style={{ margin: 0, fontSize: 'var(--text-body)', color: '#111' }}>{data.summary}</p>
@@ -41,8 +50,8 @@ export function ResumePreviewDocument({ data }: { data: ResumeData }) {
       )}
 
       {data.education.length > 0 && (
-        <section style={{ marginBottom: 'var(--space-3)' }}>
-          <h2 style={{ fontFamily: 'var(--font-serif)', fontSize: 'var(--text-body)', fontWeight: 600, marginBottom: 'var(--space-2)', textTransform: 'uppercase', letterSpacing: '0.05em' }}>
+        <section style={{ marginBottom: styles.sectionSpacing }}>
+          <h2 style={{ fontFamily: 'var(--font-serif)', fontSize: styles.sectionHeaderSize, fontWeight: 600, marginBottom: 'var(--space-2)', textTransform: 'uppercase', letterSpacing: '0.05em' }}>
             Education
           </h2>
           {data.education.map((e) => (
@@ -59,8 +68,8 @@ export function ResumePreviewDocument({ data }: { data: ResumeData }) {
       )}
 
       {data.experience.length > 0 && (
-        <section style={{ marginBottom: 'var(--space-3)' }}>
-          <h2 style={{ fontFamily: 'var(--font-serif)', fontSize: 'var(--text-body)', fontWeight: 600, marginBottom: 'var(--space-2)', textTransform: 'uppercase', letterSpacing: '0.05em' }}>
+        <section style={{ marginBottom: styles.sectionSpacing }}>
+          <h2 style={{ fontFamily: 'var(--font-serif)', fontSize: styles.sectionHeaderSize, fontWeight: 600, marginBottom: 'var(--space-2)', textTransform: 'uppercase', letterSpacing: '0.05em' }}>
             Experience
           </h2>
           {data.experience.map((e) => (
@@ -77,8 +86,8 @@ export function ResumePreviewDocument({ data }: { data: ResumeData }) {
       )}
 
       {data.projects.length > 0 && (
-        <section style={{ marginBottom: 'var(--space-3)' }}>
-          <h2 style={{ fontFamily: 'var(--font-serif)', fontSize: 'var(--text-body)', fontWeight: 600, marginBottom: 'var(--space-2)', textTransform: 'uppercase', letterSpacing: '0.05em' }}>
+        <section style={{ marginBottom: styles.sectionSpacing }}>
+          <h2 style={{ fontFamily: 'var(--font-serif)', fontSize: styles.sectionHeaderSize, fontWeight: 600, marginBottom: 'var(--space-2)', textTransform: 'uppercase', letterSpacing: '0.05em' }}>
             Projects
           </h2>
           {data.projects.map((p) => (
@@ -94,7 +103,7 @@ export function ResumePreviewDocument({ data }: { data: ResumeData }) {
 
       {data.skills.length > 0 && (
         <section>
-          <h2 style={{ fontFamily: 'var(--font-serif)', fontSize: 'var(--text-body)', fontWeight: 600, marginBottom: 'var(--space-1)', textTransform: 'uppercase', letterSpacing: '0.05em' }}>
+          <h2 style={{ fontFamily: 'var(--font-serif)', fontSize: styles.sectionHeaderSize, fontWeight: 600, marginBottom: 'var(--space-1)', textTransform: 'uppercase', letterSpacing: '0.05em' }}>
             Skills
           </h2>
           <p style={{ margin: 0, fontSize: 'var(--text-small)' }}>{data.skills.join(', ')}</p>

@@ -1,4 +1,4 @@
-import { computeAtsScore, getAtsSuggestions } from '@/lib/atsScore';
+import { computeAtsScore, getTopImprovements } from '@/lib/atsScore';
 import type { ResumeData } from '@/types/resume';
 
 interface AtsScoreMeterProps {
@@ -7,11 +7,11 @@ interface AtsScoreMeterProps {
 
 /**
  * ATS Readiness Score — calm, premium meter.
- * Shows score (0–100) and up to 3 suggestions.
+ * Shows score (0–100) and Top 3 Improvements.
  */
 export function AtsScoreMeter({ data }: AtsScoreMeterProps) {
   const score = computeAtsScore(data);
-  const suggestions = getAtsSuggestions(data);
+  const improvements = getTopImprovements(data);
 
   return (
     <div
@@ -37,7 +37,7 @@ export function AtsScoreMeter({ data }: AtsScoreMeterProps) {
           display: 'flex',
           alignItems: 'center',
           gap: 'var(--space-2)',
-          marginBottom: suggestions.length > 0 ? 'var(--space-2)' : 0,
+          marginBottom: improvements.length > 0 ? 'var(--space-2)' : 0,
         }}
       >
         <div
@@ -78,22 +78,34 @@ export function AtsScoreMeter({ data }: AtsScoreMeterProps) {
           />
         </div>
       </div>
-      {suggestions.length > 0 && (
-        <ul
-          style={{
-            margin: 0,
-            paddingLeft: 'var(--space-2)',
-            fontSize: 'var(--text-caption)',
-            color: 'var(--color-text-muted)',
-            lineHeight: 1.5,
-          }}
-        >
-          {suggestions.map((s, i) => (
-            <li key={i} style={{ marginBottom: 'var(--space-1)' }}>
-              {s}
-            </li>
-          ))}
-        </ul>
+      {improvements.length > 0 && (
+        <>
+          <div
+            style={{
+              fontSize: 'var(--text-caption)',
+              fontWeight: 500,
+              color: 'var(--color-text-muted)',
+              marginBottom: 'var(--space-1)',
+            }}
+          >
+            Top 3 Improvements
+          </div>
+          <ul
+            style={{
+              margin: 0,
+              paddingLeft: 'var(--space-2)',
+              fontSize: 'var(--text-caption)',
+              color: 'var(--color-text-muted)',
+              lineHeight: 1.5,
+            }}
+          >
+            {improvements.map((s, i) => (
+              <li key={i} style={{ marginBottom: 'var(--space-1)' }}>
+                {s}
+              </li>
+            ))}
+          </ul>
+        </>
       )}
     </div>
   );
