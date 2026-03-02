@@ -32,9 +32,21 @@ export interface ExperienceEntry {
 export interface ProjectEntry {
   id: string;
   name: string;
-  url?: string;
   description?: string;
+  techStack: string[];
+  liveUrl?: string;
+  githubUrl?: string;
+  /** @deprecated use liveUrl/githubUrl */
+  url?: string;
+  /** @deprecated use techStack */
   tech?: string;
+}
+
+/** Skills grouped by category for accordion UI */
+export interface SkillsByCategory {
+  technical: string[];
+  soft: string[];
+  tools: string[];
 }
 
 export interface ResumeData {
@@ -43,7 +55,7 @@ export interface ResumeData {
   education: EducationEntry[];
   experience: ExperienceEntry[];
   projects: ProjectEntry[];
-  skills: string[];
+  skills: SkillsByCategory;
   links: {
     github?: string;
     linkedin?: string;
@@ -63,6 +75,6 @@ export const emptyResume: ResumeData = {
   education: [],
   experience: [],
   projects: [],
-  skills: [],
+  skills: { technical: [], soft: [], tools: [] },
   links: {},
 };

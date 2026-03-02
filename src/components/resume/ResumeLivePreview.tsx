@@ -1,5 +1,6 @@
 import type { ResumeData } from '@/types/resume';
 import { TEMPLATE_STYLES, type ResumeTemplate } from '@/lib/resumeTemplate';
+import { ExternalLink, Github } from 'lucide-react';
 
 interface ResumeLivePreviewProps {
   data: ResumeData;
@@ -79,20 +80,126 @@ export function ResumeLivePreview({ data, template = 'classic' }: ResumeLivePrev
         <section style={{ marginBottom: styles.sectionSpacing }}>
           <div style={sectionHeader}>Projects</div>
           {data.projects.map((p) => (
-            <div key={p.id} style={{ marginBottom: 'var(--space-1)' }}>
-              <strong>{p.name || 'Project'}</strong>
-              {p.description && <div style={{ marginTop: 2 }}>{p.description}</div>}
+            <div
+              key={p.id}
+              style={{
+                marginBottom: 'var(--space-2)',
+                padding: 'var(--space-2)',
+                border: '1px solid var(--color-border-subtle)',
+                borderRadius: 'var(--radius)',
+                background: 'var(--color-bg)',
+              }}
+            >
+              <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', gap: 'var(--space-1)', flexWrap: 'wrap' }}>
+                <strong style={{ fontFamily: 'var(--font-serif)' }}>{p.name || 'Project'}</strong>
+                <span style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+                  {p.liveUrl && (
+                    <a href={p.liveUrl} target="_blank" rel="noopener noreferrer" aria-label="Live site" style={{ color: 'var(--color-text-muted)', display: 'flex' }}>
+                      <ExternalLink size={14} />
+                    </a>
+                  )}
+                  {p.githubUrl && (
+                    <a href={p.githubUrl} target="_blank" rel="noopener noreferrer" aria-label="GitHub" style={{ color: 'var(--color-text-muted)', display: 'flex' }}>
+                      <Github size={14} />
+                    </a>
+                  )}
+                </span>
+              </div>
+              {p.description && <div style={{ marginTop: 4, fontSize: 'var(--text-caption)' }}>{p.description}</div>}
+              {(p.techStack?.length ?? 0) > 0 && (
+                <div style={{ display: 'flex', flexWrap: 'wrap', gap: 4, marginTop: 6 }}>
+                  {p.techStack.map((t, i) => (
+                    <span
+                      key={`${t}-${i}`}
+                      style={{
+                        padding: '2px 6px',
+                        background: 'var(--color-bg-elevated)',
+                        border: '1px solid var(--color-border-subtle)',
+                        borderRadius: 9999,
+                        fontSize: 10,
+                        color: 'var(--color-text-muted)',
+                      }}
+                    >
+                      {t}
+                    </span>
+                  ))}
+                </div>
+              )}
             </div>
           ))}
         </section>
       )}
 
-      {(data.skills?.length ?? 0) > 0 && (
+      {(data.skills?.technical?.length ?? 0) > 0 || (data.skills?.soft?.length ?? 0) > 0 || (data.skills?.tools?.length ?? 0) > 0 ? (
         <section style={{ marginBottom: styles.sectionSpacing }}>
           <div style={sectionHeader}>Skills</div>
-          <p style={{ margin: 0 }}>{(data.skills ?? []).join(', ')}</p>
+          <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-2)' }}>
+            {data.skills.technical.length > 0 && (
+              <div>
+                <div style={{ fontSize: 10, color: 'var(--color-text-muted)', marginBottom: 4, textTransform: 'uppercase' }}>Technical</div>
+                <div style={{ display: 'flex', flexWrap: 'wrap', gap: 4 }}>
+                  {data.skills.technical.map((s, i) => (
+                    <span
+                      key={`${s}-${i}`}
+                      style={{
+                        padding: '2px 8px',
+                        background: 'var(--color-bg-elevated)',
+                        border: '1px solid var(--color-border-subtle)',
+                        borderRadius: 9999,
+                        fontSize: 'var(--text-caption)',
+                      }}
+                    >
+                      {s}
+                    </span>
+                  ))}
+                </div>
+              </div>
+            )}
+            {data.skills.soft.length > 0 && (
+              <div>
+                <div style={{ fontSize: 10, color: 'var(--color-text-muted)', marginBottom: 4, textTransform: 'uppercase' }}>Soft</div>
+                <div style={{ display: 'flex', flexWrap: 'wrap', gap: 4 }}>
+                  {data.skills.soft.map((s, i) => (
+                    <span
+                      key={`${s}-${i}`}
+                      style={{
+                        padding: '2px 8px',
+                        background: 'var(--color-bg-elevated)',
+                        border: '1px solid var(--color-border-subtle)',
+                        borderRadius: 9999,
+                        fontSize: 'var(--text-caption)',
+                      }}
+                    >
+                      {s}
+                    </span>
+                  ))}
+                </div>
+              </div>
+            )}
+            {data.skills.tools.length > 0 && (
+              <div>
+                <div style={{ fontSize: 10, color: 'var(--color-text-muted)', marginBottom: 4, textTransform: 'uppercase' }}>Tools & Technologies</div>
+                <div style={{ display: 'flex', flexWrap: 'wrap', gap: 4 }}>
+                  {data.skills.tools.map((s, i) => (
+                    <span
+                      key={`${s}-${i}`}
+                      style={{
+                        padding: '2px 8px',
+                        background: 'var(--color-bg-elevated)',
+                        border: '1px solid var(--color-border-subtle)',
+                        borderRadius: 9999,
+                        fontSize: 'var(--text-caption)',
+                      }}
+                    >
+                      {s}
+                    </span>
+                  ))}
+                </div>
+              </div>
+            )}
+          </div>
         </section>
-      )}
+      ) : null}
 
       {(data.links?.github || data.links?.linkedin) && (
         <section>

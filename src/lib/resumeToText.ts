@@ -42,14 +42,26 @@ export function resumeToPlainText(data: ResumeData): string {
   if ((data.projects?.length ?? 0) > 0) {
     for (const p of data.projects) {
       lines.push(p.name || 'Project');
-      if (p.url) lines.push(p.url);
+      if (p.liveUrl) lines.push(p.liveUrl);
+      if (p.githubUrl) lines.push(p.githubUrl);
       if (p.description?.trim()) lines.push(p.description.trim());
-      if (p.tech?.trim()) lines.push(p.tech.trim());
+      if ((p.techStack?.length ?? 0) > 0) lines.push(p.techStack!.join(', '));
     }
   }
   lines.push('');
   lines.push('Skills');
-  lines.push((data.skills?.length ?? 0) > 0 ? (data.skills ?? []).join(', ') : '');
+  const allSkills: string[] = [
+    ...(data.skills?.technical ?? []),
+    ...(data.skills?.soft ?? []),
+    ...(data.skills?.tools ?? []),
+  ];
+  if (allSkills.length > 0) {
+    lines.push('Technical: ' + (data.skills?.technical ?? []).join(', '));
+    if ((data.skills?.soft ?? []).length > 0) lines.push('Soft: ' + (data.skills?.soft ?? []).join(', '));
+    if ((data.skills?.tools ?? []).length > 0) lines.push('Tools: ' + (data.skills?.tools ?? []).join(', '));
+  } else {
+    lines.push('');
+  }
   lines.push('');
   lines.push('Links');
   const linkStr = [data.links?.github, data.links?.linkedin].filter(Boolean).join(' · ');

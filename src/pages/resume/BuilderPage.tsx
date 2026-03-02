@@ -1,5 +1,5 @@
-import { useCallback } from 'react';
-import type { ResumeData, EducationEntry, ExperienceEntry, ProjectEntry } from '@/types/resume';
+import { useCallback, useState } from 'react';
+import type { ResumeData, EducationEntry, ExperienceEntry, ProjectEntry, SkillsByCategory } from '@/types/resume';
 import { sampleResume } from '@/lib/sampleResume';
 import { useResumeData } from '@/context/ResumeDataContext';
 import { useTemplate } from '@/hooks/useTemplate';
@@ -7,6 +7,7 @@ import { ResumeLivePreview } from '@/components/resume/ResumeLivePreview';
 import { AtsScoreMeter } from '@/components/resume/AtsScoreMeter';
 import { TemplateTabs } from '@/components/resume/TemplateTabs';
 import { BulletGuidance } from '@/components/resume/BulletGuidance';
+import { TagInput } from '@/components/resume/TagInput';
 
 function newId(): string {
   return `id-${Date.now()}-${Math.random().toString(36).slice(2, 9)}`;
@@ -69,7 +70,12 @@ export function BuilderPage() {
   }, [setData]);
 
   const addProject = useCallback(() => {
-    const entry: ProjectEntry = { id: newId(), name: '', description: '' };
+    const entry: ProjectEntry = {
+      id: newId(),
+      name: '',
+      description: '',
+      techStack: [],
+    };
     setData((prev) => ({ ...prev, projects: [...prev.projects, entry] }));
   }, [setData]);
 
@@ -82,6 +88,29 @@ export function BuilderPage() {
       ...prev,
       projects: prev.projects.map((p) => (p.id === id ? { ...p, ...updates } : p)),
     }));
+  }, [setData]);
+
+  const updateSkillsCategory = useCallback(
+    (category: keyof SkillsByCategory, list: string[]) => {
+      setData((prev) => ({ ...prev, skills: { ...prev.skills, [category]: list } }));
+    },
+    [setData]
+  );
+
+  const [suggestSkillsLoading, setSuggestSkillsLoading] = useState(false);
+  const suggestSkills = useCallback(() => {
+    setSuggestSkillsLoading(true);
+    setTimeout(() => {
+      setData((prev) => ({
+        ...prev,
+        skills: {
+          technical: [...new Set([...prev.skills.technical, 'TypeScript', 'React', 'Node.js', 'PostgreSQL', 'GraphQL'])],
+          soft: [...new Set([...prev.skills.soft, 'Team Leadership', 'Problem Solving'])],
+          tools: [...new Set([...prev.skills.tools, 'Git', 'Docker', 'AWS'])],
+        },
+      }));
+      setSuggestSkillsLoading(false);
+    }, 1000);
   }, [setData]);
 
   return (
@@ -202,32 +231,144 @@ export function BuilderPage() {
                 Projects
               </h2>
               <button type="button" className="kodnest-btn kodnest-btn--secondary kodnest-btn--sm" onClick={addProject}>
-                Add entry
+                Add Project
               </button>
             </div>
             {data.projects.map((entry) => (
-              <div key={entry.id} style={{ border: '1px solid var(--color-border)', borderRadius: 'var(--radius)', padding: 'var(--space-2)', marginBottom: 'var(--space-2)' }}>
-                <input className="kodnest-input" placeholder="Project name" value={entry.name} onChange={(e) => updateProject(entry.id, { name: e.target.value })} style={{ marginBottom: 'var(--space-1)' }} />
-                <input className="kodnest-input" placeholder="URL (optional)" value={entry.url ?? ''} onChange={(e) => updateProject(entry.id, { url: e.target.value })} style={{ marginBottom: 'var(--space-1)' }} />
-                <textarea className="kodnest-input" placeholder="Description (optional)" value={entry.description ?? ''} onChange={(e) => updateProject(entry.id, { description: e.target.value })} rows={2} style={{ resize: 'vertical', marginBottom: 'var(--space-1)' }} />
-                <BulletGuidance text={entry.description ?? ''} />
-                <input className="kodnest-input" placeholder="Tech (optional)" value={entry.tech ?? ''} onChange={(e) => updateProject(entry.id, { tech: e.target.value })} style={{ marginBottom: 'var(--space-1)', marginTop: 'var(--space-1)' }} />
-                <button type="button" className="kodnest-btn kodnest-btn--secondary kodnest-btn--sm" onClick={() => removeProject(entry.id)} style={{ marginTop: 'var(--space-1)' }}>Remove</button>
-              </div>
+              <details
+                key={entry.id}
+                style={{ border: '1px solid var(--color-border)', borderRadius: 'var(--radius)', marginBottom: 'var(--space-2)', overflow: 'hidden' }}
+              >
+                <summary
+                  style={{
+                    padding: 'var(--space-2)',
+                    cursor: 'pointer',
+                    fontWeight: 600,
+                    listStyle: 'none',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'space-between',
+                    gap: 'var(--space-2)',
+                  }}
+                >
+                  <span style={{ flex: 1, minWidth: 0 }}>{entry.name || 'Untitled Project'}</span>
+                  <button
+                    type="button"
+                    className="kodnest-btn kodnest-btn--secondary kodnest-btn--sm"
+                    onClick={(e) => {
+                      e.preventDefault();
+                      e.stopPropagation();
+                      removeProject(entry.id);
+                    }}
+                    aria-label="Delete project"
+                  >
+                    Delete
+                  </button>
+                </summary>
+                <div style={{ padding: '0 var(--space-2) var(--space-2)', borderTop: '1px solid var(--color-border)' }}>
+                  <input
+                    className="kodnest-input"
+                    placeholder="Project Title"
+                    value={entry.name}
+                    onChange={(e) => updateProject(entry.id, { name: e.target.value })}
+                    style={{ marginBottom: 'var(--space-2)', marginTop: 'var(--space-2)' }}
+                  />
+                  <div style={{ marginBottom: 'var(--space-2)' }}>
+                    <textarea
+                      className="kodnest-input"
+                      placeholder="Description (max 200 characters)"
+                      value={entry.description ?? ''}
+                      onChange={(e) => updateProject(entry.id, { description: e.target.value.slice(0, 200) })}
+                      maxLength={200}
+                      rows={3}
+                      style={{ resize: 'vertical', width: '100%' }}
+                    />
+                    <div style={{ fontSize: 'var(--text-caption)', color: 'var(--color-text-muted)', marginTop: 4 }}>
+                      {(entry.description ?? '').length}/200
+                    </div>
+                  </div>
+                  <div style={{ marginBottom: 'var(--space-2)' }}>
+                    <label style={{ display: 'block', marginBottom: 4, fontSize: 'var(--text-caption)' }}>Tech Stack</label>
+                    <TagInput
+                      value={entry.techStack ?? []}
+                      onChange={(techStack) => updateProject(entry.id, { techStack })}
+                      placeholder="e.g. React, Node"
+                      aria-label="Project tech stack"
+                    />
+                  </div>
+                  <input
+                    type="url"
+                    className="kodnest-input"
+                    placeholder="Live URL (optional)"
+                    value={entry.liveUrl ?? ''}
+                    onChange={(e) => updateProject(entry.id, { liveUrl: e.target.value || undefined })}
+                    style={{ marginBottom: 'var(--space-1)' }}
+                  />
+                  <input
+                    type="url"
+                    className="kodnest-input"
+                    placeholder="GitHub URL (optional)"
+                    value={entry.githubUrl ?? ''}
+                    onChange={(e) => updateProject(entry.id, { githubUrl: e.target.value || undefined })}
+                  />
+                </div>
+              </details>
             ))}
           </section>
 
           <section className="resume-form-section" style={{ marginBottom: 'var(--space-4)' }}>
-            <h2 className="resume-form-section__title" style={{ fontFamily: 'var(--font-serif)', fontSize: 'var(--text-title)', fontWeight: 600, marginBottom: 'var(--space-2)', color: 'var(--color-text)' }}>
-              Skills
-            </h2>
-            <input
-              type="text"
-              className="kodnest-input"
-              placeholder="Comma-separated (e.g. React, TypeScript, Node.js)"
-              value={data.skills.join(', ')}
-              onChange={(e) => update('skills', e.target.value.split(',').map((s) => s.trim()).filter(Boolean))}
-            />
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 'var(--space-2)' }}>
+              <h2 className="resume-form-section__title" style={{ fontFamily: 'var(--font-serif)', fontSize: 'var(--text-title)', fontWeight: 600, margin: 0, color: 'var(--color-text)' }}>
+                Skills
+              </h2>
+              <button
+                type="button"
+                className="kodnest-btn kodnest-btn--secondary kodnest-btn--sm"
+                onClick={suggestSkills}
+                disabled={suggestSkillsLoading}
+              >
+                {suggestSkillsLoading ? 'Adding…' : '✨ Suggest Skills'}
+              </button>
+            </div>
+            <details style={{ marginBottom: 'var(--space-2)' }} open>
+              <summary style={{ cursor: 'pointer', fontWeight: 600, listStyle: 'none' }}>
+                Technical Skills ({data.skills.technical.length})
+              </summary>
+              <div style={{ marginTop: 'var(--space-1)', marginLeft: 0 }}>
+                <TagInput
+                  value={data.skills.technical}
+                  onChange={(list) => updateSkillsCategory('technical', list)}
+                  placeholder="Add technical skill…"
+                  aria-label="Technical skills"
+                />
+              </div>
+            </details>
+            <details style={{ marginBottom: 'var(--space-2)' }}>
+              <summary style={{ cursor: 'pointer', fontWeight: 600, listStyle: 'none' }}>
+                Soft Skills ({data.skills.soft.length})
+              </summary>
+              <div style={{ marginTop: 'var(--space-1)', marginLeft: 0 }}>
+                <TagInput
+                  value={data.skills.soft}
+                  onChange={(list) => updateSkillsCategory('soft', list)}
+                  placeholder="Add soft skill…"
+                  aria-label="Soft skills"
+                />
+              </div>
+            </details>
+            <details style={{ marginBottom: 'var(--space-2)' }}>
+              <summary style={{ cursor: 'pointer', fontWeight: 600, listStyle: 'none' }}>
+                Tools & Technologies ({data.skills.tools.length})
+              </summary>
+              <div style={{ marginTop: 'var(--space-1)', marginLeft: 0 }}>
+                <TagInput
+                  value={data.skills.tools}
+                  onChange={(list) => updateSkillsCategory('tools', list)}
+                  placeholder="Add tool…"
+                  aria-label="Tools and technologies"
+                />
+              </div>
+            </details>
           </section>
 
           <section className="resume-form-section" style={{ marginBottom: 'var(--space-4)' }}>

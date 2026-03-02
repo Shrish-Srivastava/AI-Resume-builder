@@ -1,11 +1,25 @@
 import { createContext, useContext, useState, useEffect, type ReactNode } from 'react';
-import type { ResumeData } from '@/types/resume';
+import type { ResumeData, SkillsByCategory } from '@/types/resume';
 import { emptyResume } from '@/types/resume';
 
 const STORAGE_KEY = 'resumeBuilderData';
 
 function isObject(v: unknown): v is Record<string, unknown> {
   return v != null && typeof v === 'object' && !Array.isArray(v);
+}
+
+function normalizeSkills(parsed: unknown): SkillsByCategory {
+  if (isArray(parsed)) {
+    return { technical: parsed.filter((s): s is string => typeof s === 'string'), soft: [], tools: [] };
+  }
+  if (isObject(parsed)) {
+    return {
+      technical: isArray(parsed.technical) ? parsed.technical.filter((s): s is string => typeof s === 'string') : [],
+      soft: isArray(parsed.soft) ? parsed.soft.filter((s): s is string => typeof s === 'string') : [],
+      tools: isArray(parsed.tools) ? parsed.tools.filter((s): s is string => typeof s === 'string') : [],
+    };
+  }
+  return emptyResume.skills;
 }
 
 function isArray(v: unknown): v is unknown[] {
@@ -53,17 +67,19 @@ function sanitizeResumeData(parsed: unknown): ResumeData {
     projects: isArray(parsed.projects)
       ? parsed.projects
           .filter(isObject)
-          .map((p) => ({
-            id: typeof p.id === 'string' ? p.id : `id-${Date.now()}-${Math.random().toString(36).slice(2, 9)}`,
-            name: typeof p.name === 'string' ? p.name : '',
-            url: typeof p.url === 'string' ? p.url : undefined,
-            description: typeof p.description === 'string' ? p.description : undefined,
-            tech: typeof p.tech === 'string' ? p.tech : undefined,
-          }))
+          .map((p) => {
+            const id = typeof p.id === 'string' ? p.id : `id-${Date.now()}-${Math.random().toString(36).slice(2, 9)}`;
+            const name = typeof p.name === 'string' ? p.name : '';
+            const description = typeof p.description === 'string' ? p.description : undefined;
+            let techStack: string[] = [];
+            if (isArray(p.techStack)) techStack = p.techStack.filter((t): t is string => typeof t === 'string');
+            else if (typeof p.tech === 'string' && p.tech.trim()) techStack = p.tech.split(',').map((s) => s.trim()).filter(Boolean);
+            const liveUrl = typeof p.liveUrl === 'string' ? p.liveUrl : (typeof p.url === 'string' ? p.url : undefined);
+            const githubUrl = typeof p.githubUrl === 'string' ? p.githubUrl : undefined;
+            return { id, name, description, techStack, liveUrl, githubUrl };
+          })
       : [],
-    skills: isArray(parsed.skills)
-      ? parsed.skills.filter((s): s is string => typeof s === 'string')
-      : [],
+    skills: normalizeSkills(parsed.skills),
     links: isObject(parsed.links)
       ? {
           github: typeof parsed.links.github === 'string' ? parsed.links.github : undefined,

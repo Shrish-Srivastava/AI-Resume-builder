@@ -5,6 +5,12 @@
 
 import type { ResumeData } from '@/types/resume';
 
+function getAllSkills(data: ResumeData): string[] {
+  const s = data.skills;
+  if (!s) return [];
+  return [...(s.technical ?? []), ...(s.soft ?? []), ...(s.tools ?? [])];
+}
+
 function wordCount(s: string): number {
   return s.trim().split(/\s+/).filter(Boolean).length;
 }
@@ -18,7 +24,9 @@ function hasMeasurableNumber(text: string): boolean {
 function hasNumbersInBullets(data: ResumeData): boolean {
   const checkDesc = (desc?: string) => desc && hasMeasurableNumber(desc);
   const expHas = data.experience.some((e) => checkDesc(e.description));
-  const projHas = data.projects.some((p) => checkDesc(p.description) || checkDesc(p.tech));
+  const projHas = data.projects.some(
+    (p) => checkDesc(p.description) || (p.techStack && p.techStack.some((t) => hasMeasurableNumber(t)))
+  );
   return expHas || projHas;
 }
 
@@ -41,7 +49,7 @@ export function computeAtsScore(data: ResumeData): number {
 
   const projects = data.projects ?? [];
   const experience = data.experience ?? [];
-  const skills = data.skills ?? [];
+  const skills = getAllSkills(data);
   const links = data.links ?? {};
 
   if (projects.length >= 2) score += 10;
@@ -63,7 +71,7 @@ export function getAtsSuggestions(data: ResumeData): string[] {
 
   const projects = data.projects ?? [];
   const experience = data.experience ?? [];
-  const skills = data.skills ?? [];
+  const skills = getAllSkills(data);
   const links = data.links ?? {};
 
   if (projects.length < 2) suggestions.push('Add at least 2 projects.');
@@ -85,7 +93,7 @@ export function getTopImprovements(data: ResumeData): string[] {
   const summaryWords = wordCount(data.summary ?? '');
   const projects = data.projects ?? [];
   const experience = data.experience ?? [];
-  const skills = data.skills ?? [];
+  const skills = getAllSkills(data);
 
   if (projects.length < 2) improvements.push('Add at least 2 projects.');
   if (!hasNumbersInBullets(data)) improvements.push('Add measurable impact (numbers) in bullets.');

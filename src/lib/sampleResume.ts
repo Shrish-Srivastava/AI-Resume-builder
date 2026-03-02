@@ -44,12 +44,17 @@ export const sampleResume: ResumeData = {
     {
       id: 'proj-1',
       name: 'Open Source CLI',
-      url: 'https://github.com/alex/example',
       description: 'Developer tool for local workflows. 2k+ GitHub stars.',
-      tech: 'TypeScript, Node.js',
+      techStack: ['TypeScript', 'Node.js'],
+      liveUrl: 'https://example.com/cli',
+      githubUrl: 'https://github.com/alex/example',
     },
   ],
-  skills: ['React', 'TypeScript', 'Node.js', 'PostgreSQL', 'AWS', 'Figma'],
+  skills: {
+    technical: ['React', 'TypeScript', 'Node.js', 'PostgreSQL', 'AWS'],
+    soft: ['Team Leadership', 'Problem Solving'],
+    tools: ['Figma', 'Git', 'Docker'],
+  },
   links: {
     github: 'https://github.com/alex',
     linkedin: 'https://linkedin.com/in/alexchen',

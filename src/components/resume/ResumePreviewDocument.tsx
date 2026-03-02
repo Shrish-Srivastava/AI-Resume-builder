@@ -95,21 +95,53 @@ export function ResumePreviewDocument({ data, template = 'classic' }: ResumePrev
           </h2>
           {data.projects.map((p) => (
             <div key={p.id} className="resume-entry" style={{ marginBottom: 'var(--space-2)' }}>
-              <strong style={{ fontFamily: 'var(--font-serif)' }}>{p.name || 'Project'}</strong>
-              {p.url && <span style={{ fontSize: 'var(--text-small)', color: '#555' }}> · {p.url}</span>}
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', flexWrap: 'wrap', gap: 'var(--space-1)' }}>
+                <strong style={{ fontFamily: 'var(--font-serif)' }}>{p.name || 'Project'}</strong>
+                <span style={{ display: 'flex', gap: 8, fontSize: 'var(--text-small)' }}>
+                  {p.liveUrl && (
+                    <a href={p.liveUrl} target="_blank" rel="noopener noreferrer" style={{ color: '#333' }}>Live</a>
+                  )}
+                  {p.githubUrl && (
+                    <a href={p.githubUrl} target="_blank" rel="noopener noreferrer" style={{ color: '#333' }}>GitHub</a>
+                  )}
+                </span>
+              </div>
               {p.description && <p style={{ margin: 'var(--space-1) 0 0', fontSize: 'var(--text-small)' }}>{p.description}</p>}
-              {p.tech && <p style={{ margin: 'var(--space-1) 0 0', fontSize: 'var(--text-caption)', color: '#555' }}>{p.tech}</p>}
+              {p.techStack?.length > 0 && (
+                <p style={{ margin: 'var(--space-1) 0 0', fontSize: 'var(--text-caption)', color: '#555' }}>
+                  {p.techStack.join(' · ')}
+                </p>
+              )}
             </div>
           ))}
         </section>
       )}
 
-      {data.skills.length > 0 && (
+      {(data.skills.technical.length > 0 || data.skills.soft.length > 0 || data.skills.tools.length > 0) && (
         <section>
           <h2 style={{ fontFamily: 'var(--font-serif)', fontSize: styles.sectionHeaderSize, fontWeight: 600, marginBottom: 'var(--space-1)', textTransform: 'uppercase', letterSpacing: '0.05em' }}>
             Skills
           </h2>
-          <p style={{ margin: 0, fontSize: 'var(--text-small)' }}>{data.skills.join(', ')}</p>
+          <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-2)' }}>
+            {data.skills.technical.length > 0 && (
+              <div>
+                <div style={{ fontSize: 'var(--text-caption)', color: '#555', marginBottom: 4 }}>Technical</div>
+                <p style={{ margin: 0, fontSize: 'var(--text-small)' }}>{data.skills.technical.join(', ')}</p>
+              </div>
+            )}
+            {data.skills.soft.length > 0 && (
+              <div>
+                <div style={{ fontSize: 'var(--text-caption)', color: '#555', marginBottom: 4 }}>Soft</div>
+                <p style={{ margin: 0, fontSize: 'var(--text-small)' }}>{data.skills.soft.join(', ')}</p>
+              </div>
+            )}
+            {data.skills.tools.length > 0 && (
+              <div>
+                <div style={{ fontSize: 'var(--text-caption)', color: '#555', marginBottom: 4 }}>Tools & Technologies</div>
+                <p style={{ margin: 0, fontSize: 'var(--text-small)' }}>{data.skills.tools.join(', ')}</p>
+              </div>
+            )}
+          </div>
         </section>
       )}
     </article>
