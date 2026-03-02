@@ -4,6 +4,8 @@
 
 import type { CategoryKey } from './skills';
 
+export type SkillConfidence = 'know' | 'practice';
+
 export interface HistoryEntry {
   id: string;
   createdAt: string;
@@ -11,6 +13,7 @@ export interface HistoryEntry {
   role: string;
   jdText: string;
   extractedSkills: Record<CategoryKey, string[]>;
+  skillConfidenceMap?: Record<string, SkillConfidence>;
   plan: { day: string; title: string; items: string[] }[];
   checklist: { round: string; items: string[] }[];
   questions: string[];
@@ -21,8 +24,15 @@ export interface HistoryEntry {
 const STORAGE_KEY = 'placement-readiness-history';
 
 export function saveToHistory(entry: Omit<HistoryEntry, 'id' | 'createdAt'>): HistoryEntry {
+  const skillConfidenceMap: Record<string, SkillConfidence> = entry.skillConfidenceMap ?? {};
+  for (const skills of Object.values(entry.extractedSkills)) {
+    for (const s of skills) {
+      if (!(s in skillConfidenceMap)) skillConfidenceMap[s] = 'practice';
+    }
+  }
   const full: HistoryEntry = {
     ...entry,
+    skillConfidenceMap,
     id: crypto.randomUUID(),
     createdAt: new Date().toISOString(),
   };
@@ -45,4 +55,25 @@ export function getHistory(): HistoryEntry[] {
 
 export function getEntryById(id: string): HistoryEntry | undefined {
   return getHistory().find((e) => e.id === id);
+}
+
+export function updateEntry(id: string, updates: Partial<Pick<HistoryEntry, 'skillConfidenceMap'>>): void {
+  const list = getHistory();
+  const idx = list.findIndex((e) => e.id === id);
+  if (idx === -1) return;
+  list[idx] = { ...list[idx], ...updates };
+  localStorage.setItem(STORAGE_KEY, JSON.stringify(list));
+}
+
+export function getLiveScore(entry: HistoryEntry): number {
+  const base = entry.readinessScore;
+  const map = entry.skillConfidenceMap ?? {};
+  let delta = 0;
+  for (const skills of Object.values(entry.extractedSkills)) {
+    for (const s of skills) {
+      const conf = map[s] ?? 'practice';
+      delta += conf === 'know' ? 2 : -2;
+    }
+  }
+  return Math.max(0, Math.min(100, base + delta));
 }

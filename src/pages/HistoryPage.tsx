@@ -1,6 +1,6 @@
 import { useNavigate } from 'react-router-dom';
 import { Card, CardHeader, CardTitle, CardContent } from '@/components/ui/shadcn-card';
-import { getHistory } from '@/lib/history';
+import { getHistory, getLiveScore } from '@/lib/history';
 import { History, Calendar } from 'lucide-react';
 
 export function HistoryPage() {
@@ -45,7 +45,7 @@ export function HistoryPage() {
                       </p>
                     </div>
                     <span className="flex-shrink-0 px-2.5 py-1 bg-primary/10 text-primary text-sm font-medium rounded-md">
-                      {entry.readinessScore}/100
+                      {getLiveScore(entry)}/100
                     </span>
                   </button>
                 </li>
